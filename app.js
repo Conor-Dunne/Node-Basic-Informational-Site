@@ -5,17 +5,25 @@ const path = require('path');
 
 http.createServer(function (req, res) {
   const q = url.parse(req.url, true);
-  console.log(req.url);
-  console.log(q);
   const filename = "." + (q.pathname === "/"?  "/index.html" : q.pathname )
 
   fs.readFile(filename, function(err, data) {
     if (err) {
-      res.writeHead(404, {'Content-Type': 'text/html'});
-      return res.end("404 Not Found");
-    } 
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    return res.end();
+      fs.readFile('404.html', function(err, data){
+        if (err) {
+          res.writeHead(404, {'Content-Type': 'text/plain'});
+          res.write("404 Not Found");
+          res.end(); // send the response here
+        } else {
+          res.writeHead(404, {'Content-Type': 'text/html'});
+          res.write(data);
+          res.end(); // send the response here
+        }
+      })
+    } else {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      res.end(); // send the response here
+    }
   });
 }).listen(8080);
